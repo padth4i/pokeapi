@@ -1,0 +1,39 @@
+<html>
+    <head>
+    <script>
+	
+	var api_url = "https://pokeapi.co/api/v2";
+    var request = new XMLHttpRequest();
+    
+        function search_pokemon()
+        {
+            var search = document.getElementById("search_pokemon").value;
+            
+            
+            request.open('GET', api_url+'/pokemon/'+search.toLowerCase()+'/')
+            request.onload = function ()
+            {
+                var data = JSON.parse(this.response)
+							
+			    var PokeName = data.name
+				var PokeAbility = data.abilities[0].ability.name
+				var PokeType = data.types[0].type.name
+				
+                document.getElementById("pokemon-details").innerHTML  = "<p> Pokemon Name: " + PokeName + "<br>Pokemon Type: " + PokeType + "<br>Pokemon Ability: " + PokeAbility + "</p>";
+            }
+            request.send();
+        }
+		
+		
+    </script>
+    </head>
+    <body>
+        <input id="search_pokemon" placeholder="Enter Pokemon Name"></input>
+        <button onclick="search_pokemon()">Search</button>
+		
+		<input id="search_weakness" placeholder = "Enter Weakness"></input>
+		<button onclick = "find_weakness()"> Search </button>
+        <div id="pokemon-details">
+        </div>
+    </body>
+</html>
