@@ -1,0 +1,40 @@
+<html>
+<script>
+ var api_url = "https://pokeapi.co/api/v2"
+ var request = new XMLHttpRequest();
+ var requesti = new XMLHttpRequest();
+ 
+ function find_weakness()
+		{
+		   var searchw = document.getElementById("search_weakness").value;
+		   
+		   request.open('GET', api_url + '/type/' + searchw.toLowerCase() + '/');
+		   request.onload = function ()
+		   {
+		   var dataw = JSON.parse(this.response);
+		   var j;
+			for(j=0; j<dataw.damage_relations.double_damage_from.length; j++)
+			requesti.open('GET', api_url + '/type/' + dataw.damage_relations.double_damage_from[0].name + '/');
+			requesti.onload = function()
+		    {
+			  var datawin = JSON.parse(this.response);
+			  var i
+			  
+			  for(i=0; i<datawin.pokemon.length; i++)
+			  {
+              document.getElementById("weakness").innerHTML += "<p>" + datawin.pokemon[i].pokemon.name + "</p>";
+			   }
+			  }
+		    requesti.send();
+		   }
+		   request.send();
+		   }
+</script>
+
+<body>
+ <input id="search_weakness" placeholder="Enter weakness" ></input>
+ <button onclick="find_weakness()">Search</button>
+ <div id="weakness">
+ </div>
+</body>
+</html>
