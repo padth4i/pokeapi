@@ -1,37 +1,78 @@
+
 <html>
     <head>
+    <title>PokeAPI</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
     <script>
-	
+
 	var api_url = "https://pokeapi.co/api/v2";
     var request = new XMLHttpRequest();
-    
+
         function search_pokemon()
         {
             var search = document.getElementById("search_pokemon").value;
-            
-            
-            request.open('GET', api_url+'/pokemon/'+search.toLowerCase()+'/')
+
+
+            request.open('GET', api_url+'/pokemon/'+search.toLowerCase() + '/')
             request.onload = function ()
             {
-                var data = JSON.parse(this.response)
-							
-			    var PokeName = data.name
-				var PokeAbility = data.abilities[0].ability.name
-				var PokeType = data.types[0].type.name
-				
-                document.getElementById("pokemon-details").innerHTML  = "<p> Pokemon Name: " + PokeName + "<br>Pokemon Type: " + PokeType + "<br>Pokemon Ability: " + PokeAbility + "</p>";
+
+                if (request.status >= 200 && request.status < 400) {
+                    var data = JSON.parse(this.response);
+                    document.getElementById("p_name").innerHTML  = data.name;
+
+                    document.getElementById("p_ability").innerHTML =  "<h3>Ability</h3>";
+                    data.abilities.forEach(ability => {
+                            document.getElementById("p_ability").innerHTML += '<li>' + ability.ability.name + '</li>';
+                    });
+
+                    document.getElementById("p_type").innerHTML = "<h3>Types</h3>";
+                    document.getElementById("weak_against").innerHTML = "<h3>Weak Against</h3>";
+                    data.types.forEach(type => {
+                            document.getElementById("p_type").innerHTML += '<li>' + type.type.name + '</li>';
+                            var type_request = new XMLHttpRequest();
+
+                     		   type_request.open('GET', api_url + '/type/' + type.type.name.toLowerCase() + '/');
+                     		   type_request.onload = function ()
+                     		   {
+                                var type_data = JSON.parse(this.response);
+                                type_data.damage_relations.double_damage_from.forEach(type => {
+
+                                    var weakness_request = new XMLHttpRequest();
+                                    weakness_request.open('GET', type.url + '/');
+                              			weakness_request.onload = function()
+                                    {
+                                        var pokes = JSON.parse(this.response);
+                                        document.getElementById("weak_against").innerHTML += '<h4>' + pokes.name + '</h4>';
+                                        pokes.pokemon.forEach(pokemon => {
+                                            document.getElementById("weak_against").innerHTML += '<li>' + pokemon.pokemon.name + '</li>';
+                                        });
+                                    }
+                                    weakness_request.send();
+                                });
+                           }
+                           type_request.send();
+                    });
+                }
+                else
+                {
+                    document.getElementById("pokemon_details").innerHTML =  "<h1>Not Found.</h1>";
+                }
+
             }
             request.send();
         }
-		
-		
     </script>
     </head>
     <body>
-        <input id="search_pokemon" placeholder="Enter Pokemon Name"></input>
+        <input id="search_pokemon" placeholder="Enter Pokemon Name">
         <button onclick="search_pokemon()">Search</button>
-		
         <div id="pokemon-details">
-        </div>
-    </body>
+            <h1 id="p_name"></h1>
+            <div id="p_ability"></div>
+            <div id="p_type"></div>
+            <div id="weak_against"></div>
+
+
+  </body>
 </html>
